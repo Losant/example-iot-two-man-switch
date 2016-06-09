@@ -3,17 +3,7 @@ import time
 from losantmqtt import Device
 from neopixel import *
 import atexit
-
-# Define our pins
-BUTTON_PIN = 12
-KEY_PIN = 23
-LED_PIN = 18
-
-# Define Losant credentials
-DEVICE_ID = '57578afde7a2700100d1dcb3'
-ACCESS_KEY = '8ac0fd3f-1805-4087-82f0-b6e7ac3a5f04'
-ACCESS_SECRET = '72722375d01b66217ce250e5a708dfeb5faf83573563a4b711a847eb09423faa'
-MY_LED_INDEX = 0 # the index that this device ID is mapped to in the workflow
+from config import * # contains DEVICE_ID, ACCESS_KEY, ACCESS_SECRET, MY_LED_INDEX, BUTTON_PIN, KEY_PIN, LED_PIN
 
 # Define Neopixels
 LED_COUNT = 100 # Number of switches. set to a high number so we don't have to come back later and change devices if we add more switches
