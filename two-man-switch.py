@@ -10,9 +10,9 @@ KEY_PIN = 23
 LED_PIN = 18
 
 # Define Losant credentials
-DEVICE_ID = 'my_device_id'
-ACCESS_KEY = 'my_access_key'
-ACCESS_SECRET = 'my_access_secret'
+DEVICE_ID = '57578afde7a2700100d1dcb3'
+ACCESS_KEY = '8ac0fd3f-1805-4087-82f0-b6e7ac3a5f04'
+ACCESS_SECRET = '72722375d01b66217ce250e5a708dfeb5faf83573563a4b711a847eb09423faa'
 MY_LED_INDEX = 0 # the index that this device ID is mapped to in the workflow
 
 # Define Neopixels
@@ -74,8 +74,8 @@ device.connect(blocking=False)
 
 # gpio setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #try switching this to PUD_DOWN and flipping the bangs below
-GPIO.setup(KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #try switching this to PUD_DOWN and flipping the bangs below
+GPIO.setup(KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 is_button_pressed = False
 is_key_turned = 0 # treating this as a number instead of a boolean. will make it easier to calculate if all buttons are pressed
@@ -101,7 +101,7 @@ while True:
     device.loop()
 
     # Key
-    key_state = not GPIO.input(KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
+    key_state = GPIO.input(KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
     #if key_state == True: #changed from false (flipped above)
     if key_state == True and is_key_turned == 0:
     # state changed to turned
@@ -116,7 +116,7 @@ while True:
         if device.is_connected():
             device.send_state({ "isKeyTurned": is_key_turned})
 # Button
-    button_state = not GPIO.input(BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
+    button_state = GPIO.input(BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
     if button_state == True and is_button_pressed == False:
     # state changed to pressed
         print('Button Pressed')
