@@ -74,8 +74,8 @@ device.connect(blocking=False)
 
 # gpio setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #try switching this to PUD_DOWN and flipping the bangs below
-GPIO.setup(KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 is_button_pressed = False
 is_key_turned = 0 # treating this as a number instead of a boolean. will make it easier to calculate if all buttons are pressed
@@ -101,7 +101,7 @@ while True:
     device.loop()
 
     # Key
-    key_state = GPIO.input(KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
+    key_state = not GPIO.input(KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
     #if key_state == True: #changed from false (flipped above)
     if key_state == True and is_key_turned == 0:
     # state changed to turned
@@ -116,7 +116,7 @@ while True:
         if device.is_connected():
             device.send_state({ "isKeyTurned": is_key_turned})
 # Button
-    button_state = GPIO.input(BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
+    button_state = not GPIO.input(BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
     if button_state == True and is_button_pressed == False:
     # state changed to pressed
         print('Button Pressed')
