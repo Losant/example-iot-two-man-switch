@@ -16,12 +16,12 @@ def on_command(device, command):
         keyStatus = command["payload"]["keyStatus"]
         print(deviceId)
         print(keyStatus)
-        new_color = 'off' #default offline
+        new_color = 'blue' #default offline
         if(keyStatus == 'engaged'):
             new_color = 'green'
         if(keyStatus == 'disengaged'):
             new_color = 'red'
-        setColor(deviceId, colors[new_color])
+        setColor(deviceId, new_color)
     if(command["name"] == "btnPressedAnim"):
         animColor = 'red' # assume failure
         if(command["payload"] and command["payload"]["status"] == "succeeded"):
@@ -45,7 +45,6 @@ def ledPinSetup(pins):
     # turn off by default
     for pin in pins:
         GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, 1)
 
 ledPinSetup(losantconfig.LED_PINS[losantconfig.MY_DEVICE_ID])
 ledPinSetup(losantconfig.LED_PINS[losantconfig.OTHER_DEVICE_ID])
@@ -56,19 +55,23 @@ is_key_turned = 0 # treating this as a number instead of a boolean. will make it
 
 
 def statusBlink(color, wait_ms=50, iterations=10):
+    print(color) 
     for i in range(iterations):
         time.sleep(wait_ms/1000.0)
-        setColor([losantconfig.MY_DEVICE_ID], colors[color])
-        setColor([losantconfig.OTHER_DEVICE_ID], colors[color])
+        setColor(losantconfig.MY_DEVICE_ID, color)
+        setColor(losantconfig.OTHER_DEVICE_ID, color)
         time.sleep(wait_ms/1000.0)
-        setColor([losantconfig.MY_DEVICE_ID], colors[off])
-        setColor([losantconfig.OTHER_DEVICE_ID], colors[off])
+        setColor(losantconfig.MY_DEVICE_ID, 'blue')
+        setColor(losantconfig.OTHER_DEVICE_ID, 'blue')
+    # set back to red (disengaged) on end
+    setColor(losantconfig.MY_DEVICE_ID, 'red')
+    setColor(losantconfig.OTHER_DEVICE_ID, 'red')
 
 # define colors
 colors = {
     'red': [1,0,0],
     'green': [0,1,0],
-    'off': [0,0,0]
+    'blue': [0,0,1] # not hooking up to the blue pin for now so this will be off
 }
 
 # in common anode mode, these are flipped
@@ -76,20 +79,24 @@ if(losantconfig.LED_COMMON_MODE == 'anode'):
     colors = {
         'red': [0,1,1],
         'green': [1,0,1],
-        'off': [1,1,1]
+        'blue': [1,1,0] # not hooking up to the blue pin for now so this will be off
     }
 
 def setColor(deviceId, color):
+    print(deviceId)
     color_to_set = colors[color]
-    print(color_to_set)
-#     for pin in losantconfig.LED_PINS[deviceId]
-#            GPIO.output(pin, colors[color][idx])
+    for index, pin in enumerate(losantconfig.LED_PINS[deviceId]):
+        print('setting pin',pin,'to',index)
+	GPIO.output(pin, color_to_set[index])
 
+
+# set both lights to red to begin
+setColor(losantconfig.MY_DEVICE_ID, 'red')
+setColor(losantconfig.OTHER_DEVICE_ID,'red')
 
 try:
     while True:
         device.loop()
-
         # Key
         key_state = not GPIO.input(losantconfig.KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
         #if key_state == True: #changed from false (flipped above)
