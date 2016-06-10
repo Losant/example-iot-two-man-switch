@@ -21,7 +21,7 @@ def on_command(device, command):
         if(keyStatus == 'disengaged'):
             new_color = 'off'
     if(command["name"] == "btnPressedAnim"):
-        animColor = 'red'' # assume failure
+        animColor = 'red' # assume failure
         if(command["payload"] and command["payload"]["status"] == "succeeded"):
             animColor = 'green' #yay!
         statusBlink(animColor, 150, 7)
