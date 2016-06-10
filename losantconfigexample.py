@@ -9,8 +9,10 @@ OTHER_DEVICE_ID = 'other_switch_device_id'
 BUTTON_PIN = 12
 KEY_PIN = 23
 
-# are the RGB LEDs common cathode or anode?
-LED_COMMON_MODE = 'cathode'
+# are the RGB LEDs common anode or cathode?
+LED_COMMON_MODE = 'anode'
+# anode: hook the common pin to 3.3v pin
+# cathod: hook the common pin to ground
 
 LED_PINS = {}
 LED_PINS[MY_DEVICE_ID] = [13, 19, 26] # [R, G, B]
