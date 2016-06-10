@@ -64,17 +64,17 @@ def statusBlink(color, wait_ms=50, iterations=10):
 
 # define colors
 colors = {
-    red: [1,0,0],
-    green: [0,1,0],
-    off: [0,0,0]
+    'red': [1,0,0],
+    'green': [0,1,0],
+    'off': [0,0,0]
 }
 
 # in common anode mode, these are flipped
 if(losantconfig.LED_COMMON_MODE == 'anode'):
     colors = {
-        red: [0,1,1],
-        green: [1,0,1],
-        off: [1,1,1]
+        'red': [0,1,1],
+        'green': [1,0,1],
+        'off': [1,1,1]
     }
 
 def setColor(deviceId, color):
