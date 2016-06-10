@@ -80,8 +80,10 @@ if(losantconfig.LED_COMMON_MODE == 'anode'):
     }
 
 def setColor(deviceId, color):
-    for idx, pin in enumerate(losantconfig.LED_PINS[deviceId]):
-        GPIO.output(pin, colors[color][idx])
+    for pin in losantconfig.LED_PINS[deviceId]:
+        GPIO.output(pin, colors[color][0])
+        GPIO.output(pin, colors[color][1])
+        GPIO.output(pin, colors[color][2])
 
 
 try:
