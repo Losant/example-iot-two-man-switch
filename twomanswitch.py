@@ -11,18 +11,20 @@ def on_command(device, command):
     print(command["name"])
     print(command["payload"])
     if(command["name"] == "setKeyStatus"):
-        ledIndex = command["payload"]["ledIndex"]
+        deviceId = command["payload"]["deviceId"]
         keyStatus = command["payload"]["keyStatus"]
-        print(ledIndex)
+        print(deviceId)
         print(keyStatus)
-        new_color = red # default offline
+        new_color = 'off' #default offline
         if(keyStatus == 'engaged'):
-            new_color = green
+            new_color = 'green'
+        if(keyStatus == 'disengaged'):
+            new_color = 'off'
     if(command["name"] == "btnPressedAnim"):
-        animColor = red # assume failure
+        animColor = 'red'' # assume failure
         if(command["payload"] and command["payload"]["status"] == "succeeded"):
-            animColor = green #yay!
-        statusBlink(strip, animColor, 150, 7)
+            animColor = 'green' #yay!
+        statusBlink(animColor, 150, 7)
 
 
 # Listen for commands.
@@ -32,30 +34,52 @@ device.add_event_observer("command", on_command)
 device.connect(blocking=False)
 
 # gpio setup
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(losantconfig.BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(losantconfig.KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-def pinSetup(pins):
+def ledPinSetup(pins):
+    # turn off by default
     for pin in pins:
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, 1)
+ledPinSetup(losantconfig.LED_PINS[losantconfig.MY_DEVICE_ID])
+ledPinSetup(losantconfig.LED_PINS[losantconfig.OTHER_DEVICE_ID])
 
-pinSetup(losantconfig.LED_PINS[losantconfig.MY_DEVICE_ID])
-pinSetup(losantconfig.LED_PINS[losantconfig.OTHER_DEVICE_ID])
-
-
-
+# initial state
 is_button_pressed = False
 is_key_turned = 0 # treating this as a number instead of a boolean. will make it easier to calculate if all buttons are pressed
 
 
-def statusBlink(strip, color, wait_ms=50, iterations=10):
+def statusBlink(color, wait_ms=50, iterations=10):
 	for j in range(iterations):
+        setColor([losantconfig.MY_DEVICE_ID], colors[color])
+        setColor([losantconfig.OTHER_DEVICE_ID], colors[color])
 		time.sleep(wait_ms/1000.0)
+        setColor([losantconfig.MY_DEVICE_ID], colors[off])
+        setColor([losantconfig.OTHER_DEVICE_ID], colors[off])
 		time.sleep(wait_ms/1000.0)
 
-GPIO.output(13, 0)
+# define colors
+colors = {
+    red: [1,0,0]
+    green: [0,1,0]
+    off: [0,0,0]
+}
+
+# in common anode mode, these are flipped
+if(losantconfig.LED_COMMON_MODE == 'anode'):
+    colors = {
+        red: [0,1,1]
+        green: [1,0,1]
+        off: [1,1,1]
+    }
+
+def setColor(deviceId, color):
+    for idx, pin in enumerate(losantconfig[deviceId]):
+        GPIO.output(pin, colors[color][idx])
+
 
 try:
     while True:
