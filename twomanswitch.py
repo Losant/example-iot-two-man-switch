@@ -41,8 +41,8 @@ def pinSetup(pins):
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, 1)
 
-pinSetup(losantconfig.LED_PINS[MY_DEVICE_ID])
-pinSetup(losantconfig.LED_PINS[OTHER_DEVICE_ID])
+pinSetup(losantconfig.LED_PINS[losantconfig.MY_DEVICE_ID])
+pinSetup(losantconfig.LED_PINS[losantconfig.OTHER_DEVICE_ID])
 
 
 
