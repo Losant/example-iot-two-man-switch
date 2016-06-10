@@ -3,7 +3,7 @@ import time
 from losantmqtt import Device
 from neopixel import *
 import atexit
-from config import * # contains DEVICE_ID, ACCESS_KEY, ACCESS_SECRET, MY_LED_INDEX, BUTTON_PIN, KEY_PIN, LED_PIN
+import losantconfig
 
 # Define Neopixels
 LED_COUNT = 100 # Number of switches. set to a high number so we don't have to come back later and change devices if we add more switches
@@ -13,7 +13,7 @@ LED_BRIGHTNESS = 255 # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False # True to invert the signal (when using NPN transistor level shift
 
 # Create NeoPixel object with appropriate configuration.
-strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
+strip = Adafruit_NeoPixel(LED_COUNT, losantconfig.LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 # Intialize the library (must be called once before other functions).
 strip.begin()
 
@@ -22,7 +22,7 @@ green = Color(255,0,0)
 off = Color(0,0,0)
 
 # Construct device
-device = Device(DEVICE_ID, ACCESS_KEY, ACCESS_SECRET)
+device = Device(losantconfig.DEVICE_ID, losantconfig.ACCESS_KEY, losantconfig.ACCESS_SECRET)
 
 def switch_offline(i):
     strip.setPixelColor(i, red)
@@ -64,8 +64,8 @@ device.connect(blocking=False)
 
 # gpio setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(losantconfig.BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(losantconfig.KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 is_button_pressed = False
 is_key_turned = 0 # treating this as a number instead of a boolean. will make it easier to calculate if all buttons are pressed
