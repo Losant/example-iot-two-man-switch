@@ -141,7 +141,7 @@ try:
             print('Button Released')
             is_button_pressed = False
             # no need to send state here
-        time.sleep(0.2) # wait before executing again
+        time.sleep(0.02) # wait before executing again
 
 except KeyboardInterrupt:
     GPIO.cleanup()
