@@ -66,24 +66,24 @@ def statusBlink(color, wait_ms=50, iterations=10):
 
 # define colors
 colors = {
-    'red': {"r":1,"g":0,"b":0},
-    'green': {"r":0,"g":1,"b":0},
-    'off': {"r":0,"g":0,"b":0}
+    'red': [1,0,0],
+    'green': [0,1,0],
+    'off': [0,0,0]
 }
 
 # in common anode mode, these are flipped
 if(losantconfig.LED_COMMON_MODE == 'anode'):
     colors = {
-        'red': {"r":0,"g":1,"b":1},
-        'green': {"r":1,"g":0,"b":1},
-        'off': {"r":1,"g":1,"b":1}
+        'red': [0,1,1],
+        'green': [1,0,1],
+        'off': [1,1,1]
     }
 
 def setColor(deviceId, color):
-    for pin in losantconfig.LED_PINS[deviceId]:
-        GPIO.output(pin, colors[color].r)
-        GPIO.output(pin, colors[color].g)
-        GPIO.output(pin, colors[color].b)
+    color_to_set = colors[color]
+    print(color_to_set)
+#     for pin in losantconfig.LED_PINS[deviceId]
+#            GPIO.output(pin, colors[color][idx])
 
 
 try:
