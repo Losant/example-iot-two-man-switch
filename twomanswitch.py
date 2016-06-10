@@ -21,7 +21,7 @@ def on_command(device, command):
             new_color = 'green'
         if(keyStatus == 'disengaged'):
             new_color = 'red'
-        setColor(deviceId, colors[new_color])
+        setColor(deviceId, new_color)
     if(command["name"] == "btnPressedAnim"):
         animColor = 'red' # assume failure
         if(command["payload"] and command["payload"]["status"] == "succeeded"):
@@ -58,11 +58,11 @@ is_key_turned = 0 # treating this as a number instead of a boolean. will make it
 def statusBlink(color, wait_ms=50, iterations=10):
     for i in range(iterations):
         time.sleep(wait_ms/1000.0)
-        setColor([losantconfig.MY_DEVICE_ID], colors[color])
-        setColor([losantconfig.OTHER_DEVICE_ID], colors[color])
+        setColor([losantconfig.MY_DEVICE_ID], color)
+        setColor([losantconfig.OTHER_DEVICE_ID], color)
         time.sleep(wait_ms/1000.0)
-        setColor([losantconfig.MY_DEVICE_ID], colors[off])
-        setColor([losantconfig.OTHER_DEVICE_ID], colors[off])
+        setColor([losantconfig.MY_DEVICE_ID], color)
+        setColor([losantconfig.OTHER_DEVICE_ID], color)
 
 # define colors
 colors = {
@@ -82,8 +82,10 @@ if(losantconfig.LED_COMMON_MODE == 'anode'):
 def setColor(deviceId, color):
     color_to_set = colors[color]
     print(color_to_set)
-#     for pin in losantconfig.LED_PINS[deviceId]
-#            GPIO.output(pin, colors[color][idx])
+    for pin in losantconfig.LED_PINS[deviceId]:
+        GPIO.output(pin, color_to_set[0])
+        GPIO.output(pin, color_to_set[1])
+        GPIO.output(pin, color_to_set[2])
 
 
 try:
