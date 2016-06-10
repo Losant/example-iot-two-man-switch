@@ -1,12 +1,10 @@
 import RPi.GPIO as GPIO
 import time
 from losantmqtt import Device
+from losantrest import Client
 import losantconfig
 
-
-# Construct device
-device = Device(losantconfig.MY_DEVICE_ID, losantconfig.ACCESS_KEY, losantconfig.ACCESS_SECRET)
-
+# MQTT SETUP
 def on_command(device, command):
     print("Command received.")
     print(command["name"])
@@ -29,14 +27,28 @@ def on_command(device, command):
         statusBlink(animColor, 150, 7)
 
 
+# Construct device
+device = Device(losantconfig.MY_DEVICE_ID, losantconfig.ACCESS_KEY, losantconfig.ACCESS_SECRET)
 # Listen for commands.
 device.add_event_observer("command", on_command)
-
 # Connect to Losant.
 device.connect(blocking=False)
 
-# gpio setup
 
+# REST setup
+client = Client()
+creds = {
+    'deviceId': losantconfig.MY_DEVICE_ID,
+    'key': losantconfig.ACCESS_KEY,
+    'secret': losantconfig.ACCESS_SECRET
+}
+rest_response = client.auth.authenticate_device(credentials=creds)
+
+client.auth_token = rest_response['token']
+app_id = rest_response['applicationId']
+
+
+# GPIO setup
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(losantconfig.BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(losantconfig.KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -55,7 +67,7 @@ is_key_turned = 0 # treating this as a number instead of a boolean. will make it
 
 
 def statusBlink(color, wait_ms=50, iterations=10):
-    print(color) 
+    print(color)
     for i in range(iterations):
         time.sleep(wait_ms/1000.0)
         setColor(losantconfig.MY_DEVICE_ID, color)
@@ -119,7 +131,11 @@ try:
             print('Button Pressed')
             is_button_pressed = True
             if device.is_connected():
-                device.send_state({ "isButtonPressed": is_button_pressed })
+                # send this state via REST
+                state = {'data': {'isButtonPressed': is_button_pressed}}
+                client.device.send_state(deviceId=losantconfig.MY_DEVICE_ID,
+                    applicationId=app_id, deviceState=state)
+
         if button_state == False and is_button_pressed == True:
         # state changed to released
             print('Button Released')
