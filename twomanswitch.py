@@ -3,6 +3,7 @@ import time
 from losantmqtt import Device
 import losantconfig
 
+
 # Construct device
 device = Device(losantconfig.MY_DEVICE_ID, losantconfig.ACCESS_KEY, losantconfig.ACCESS_SECRET)
 
@@ -20,6 +21,7 @@ def on_command(device, command):
             new_color = 'green'
         if(keyStatus == 'disengaged'):
             new_color = 'red'
+        setColor(deviceId, colors[new_color])
     if(command["name"] == "btnPressedAnim"):
         animColor = 'red' # assume failure
         if(command["payload"] and command["payload"]["status"] == "succeeded"):
@@ -78,7 +80,7 @@ if(losantconfig.LED_COMMON_MODE == 'anode'):
     }
 
 def setColor(deviceId, color):
-    for idx, pin in enumerate(losantconfig[deviceId]):
+    for pin in enumerate(losantconfig.LED_PINS[deviceId]):
         GPIO.output(pin, colors[color][idx])
 
 
