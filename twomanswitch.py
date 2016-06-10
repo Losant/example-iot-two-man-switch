@@ -91,7 +91,7 @@ while True:
     device.loop()
 
     # Key
-    key_state = not GPIO.input(KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
+    key_state = not GPIO.input(losantconfig.KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
     #if key_state == True: #changed from false (flipped above)
     if key_state == True and is_key_turned == 0:
     # state changed to turned
@@ -106,7 +106,7 @@ while True:
         if device.is_connected():
             device.send_state({ "isKeyTurned": is_key_turned})
 # Button
-    button_state = not GPIO.input(BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
+    button_state = not GPIO.input(losantconfig.BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
     if button_state == True and is_button_pressed == False:
     # state changed to pressed
         print('Button Pressed')
