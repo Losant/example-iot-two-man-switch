@@ -3,7 +3,6 @@ import time
 from losantmqtt import Device
 import losantconfig
 
-
 # Construct device
 device = Device(losantconfig.MY_DEVICE_ID, losantconfig.ACCESS_KEY, losantconfig.ACCESS_SECRET)
 
@@ -42,8 +41,8 @@ def pinSetup(pins):
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, 1)
 
-pinSetup(LED_PINS[MY_DEVICE_ID])
-pinSetup(LED_PINS[OTHER_DEVICE_ID])
+pinSetup(losantconfig.LED_PINS[MY_DEVICE_ID])
+pinSetup(losantconfig.LED_PINS[OTHER_DEVICE_ID])
 
 
 
