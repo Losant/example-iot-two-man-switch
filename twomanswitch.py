@@ -4,7 +4,7 @@ from losantmqtt import Device
 from losantrest import Client
 import losantconfig
 
-# MQTT SETUP
+#### MQTT SETUP ####
 def on_command(device, command):
     print("Command received.")
     print(command["name"])
@@ -25,8 +25,6 @@ def on_command(device, command):
         if(command["payload"] and command["payload"]["status"] == "succeeded"):
             animColor = 'green' #yay!
         statusBlink(animColor, 150, 7)
-
-
 # Construct device
 device = Device(losantconfig.MY_DEVICE_ID, losantconfig.ACCESS_KEY, losantconfig.ACCESS_SECRET)
 # Listen for commands.
@@ -35,20 +33,20 @@ device.add_event_observer("command", on_command)
 device.connect(blocking=False)
 
 
-# REST setup
+#### REST setup ###
 client = Client()
 creds = {
     'deviceId': losantconfig.MY_DEVICE_ID,
     'key': losantconfig.ACCESS_KEY,
     'secret': losantconfig.ACCESS_SECRET
 }
+# Connect via REST and save the response for future connections
 rest_response = client.auth.authenticate_device(credentials=creds)
-
 client.auth_token = rest_response['token']
 app_id = rest_response['applicationId']
 
 
-# GPIO setup
+#### GPIO setup ####
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(losantconfig.BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(losantconfig.KEY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -107,41 +105,47 @@ setColor(losantconfig.MY_DEVICE_ID, 'red')
 setColor(losantconfig.OTHER_DEVICE_ID,'red')
 
 try:
-    while True:
-        device.loop()
-        # Key
+    while True: # keep doing this forever and ever
+        device.loop() # keeps MQTT connection alive
+
+        ### Key State ###
         key_state = not GPIO.input(losantconfig.KEY_PIN) # False is when the key is turned, so we're flipping it for sanity's sake
-        #if key_state == True: #changed from false (flipped above)
-        if key_state == True and is_key_turned == 0:
+
         # state changed to turned
+        if key_state == True and is_key_turned == 0:
             print('Key Turned')
             is_key_turned = 1
             if device.is_connected():
+                # send the key's state via MQTT
                 device.send_state({ "isKeyTurned": is_key_turned})
-        if key_state == False and is_key_turned == 1:
+
         # state changed to unturned
+        if key_state == False and is_key_turned == 1:
             print('Key Released')
             is_key_turned = 0
             if device.is_connected():
+                # send the key's state via MQTT
                 device.send_state({ "isKeyTurned": is_key_turned})
-    # Button
+
+        ### Button State ###
         button_state = not GPIO.input(losantconfig.BUTTON_PIN) # False is when the button is pressed, so we're flipping it for sanity's sake
-        if button_state == True and is_button_pressed == False:
+
         # state changed to pressed
+        if button_state == True and is_button_pressed == False:
             print('Button Pressed')
             is_button_pressed = True
             if device.is_connected():
-                # send this state via REST
+                # just for kicks, send this state via REST instead of MQTT
                 state = {'data': {'isButtonPressed': is_button_pressed}}
                 client.device.send_state(deviceId=losantconfig.MY_DEVICE_ID,
                     applicationId=app_id, deviceState=state)
 
-        if button_state == False and is_button_pressed == True:
         # state changed to released
+        if button_state == False and is_button_pressed == True:
             print('Button Released')
             is_button_pressed = False
             # no need to send state here
         time.sleep(0.02) # wait before executing again
 
 except KeyboardInterrupt:
-    GPIO.cleanup()
+    GPIO.cleanup() #reset our pins on program exit
